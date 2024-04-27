@@ -7,25 +7,26 @@ namespace Casino;
 internal static class Program {
     private static void Main() {
         Console.OutputEncoding = Encoding.Unicode;
-        Console.CursorVisible = false;
-
-        DrawBorder();
-        MenuLocation currentLocation = 0;
-        do {
-            DrawMenu(currentLocation);
-        } while (InteractWithMenu(ref currentLocation));
-
-        switch (currentLocation) {
-            case MenuLocation.Blackjack:
-                new Blackjack().Play();
-                break;
-            case MenuLocation.Quit:
-                // Return out of Main to close the Program
-                // Could also use Environment.Exit(0);
-                return; 
-        }
         
-        Console.ReadLine();
+        MenuLocation currentLocation = 0;
+        var moneyWon = 0;
+
+        while (true) {
+            Console.CursorVisible = false;
+            Console.Clear();
+            DrawBorder();
+            do {
+                DrawMenu(currentLocation, moneyWon);
+            } while (InteractWithMenu(ref currentLocation));
+            
+            if (currentLocation == MenuLocation.Quit) return;
+
+            moneyWon += currentLocation switch {
+                MenuLocation.Blackjack => Blackjack.Play(),
+                MenuLocation.Kings => Kings.Play(),
+                _ => 0
+            };
+        }
     }
 
     private static void DrawBorder() {
@@ -48,7 +49,7 @@ internal static class Program {
         }
     }
 
-    private static void DrawMenu(MenuLocation location) {
+    private static void DrawMenu(MenuLocation location, int moneyWon) {
         var options = Enum.GetNames<MenuLocation>();
 
         for (int i = 0; i < options.Length; i++) {
@@ -57,6 +58,9 @@ internal static class Program {
             Console.Write(options[i]);
             Console.ForegroundColor = ConsoleColor.White;
         }
+        
+        Console.SetCursorPosition(1, 1);
+        Console.Write($"Total won: {moneyWon}€");
     }
 
     private static bool InteractWithMenu(ref MenuLocation location) {
