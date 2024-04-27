@@ -6,10 +6,12 @@ namespace Casino;
 
 internal static class Program {
     private static void Main() {
+        // Planned games: Blackjack ✔, Kings ✔, Roulette
+        
         Console.OutputEncoding = Encoding.Unicode;
         
         MenuLocation currentLocation = 0;
-        var moneyWon = 0;
+        int moneyWon = 0;
 
         while (true) {
             Console.CursorVisible = false;
@@ -22,8 +24,8 @@ internal static class Program {
             if (currentLocation == MenuLocation.Quit) return;
 
             moneyWon += currentLocation switch {
-                MenuLocation.Blackjack => Blackjack.Play(),
-                MenuLocation.Kings => Kings.Play(),
+                MenuLocation.Blackjack => new Blackjack().Play(),
+                MenuLocation.Kings => new Kings().Play(),
                 _ => 0
             };
         }
@@ -50,7 +52,7 @@ internal static class Program {
     }
 
     private static void DrawMenu(MenuLocation location, int moneyWon) {
-        var options = Enum.GetNames<MenuLocation>();
+        string[] options = Enum.GetNames<MenuLocation>();
 
         for (int i = 0; i < options.Length; i++) {
             Console.SetCursorPosition((Console.WindowWidth - options[i].Length) / 2, 10 + i * 3);
@@ -64,7 +66,7 @@ internal static class Program {
     }
 
     private static bool InteractWithMenu(ref MenuLocation location) {
-        var key = Console.ReadKey(true).Key;
+        ConsoleKey key = Console.ReadKey(true).Key;
 
         switch (key) {
             case ConsoleKey.UpArrow:

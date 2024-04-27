@@ -1,42 +1,17 @@
 namespace Casino.Games;
 
-public static class Blackjack {
-    public static int Play() {
-        Console.CursorVisible = true;
-        var moneyWon = 0;
-        Console.Clear();
-        
-        PrintRules();
-
-        string continuationKey;
-        do {
-            Console.Clear();
-            int bet;
-            do {
-                Console.Write("Place your bet: ");
-            } while (!int.TryParse(Console.ReadLine()!, out bet));
-            
-            var won = PlayRound(bet);
-            moneyWon += won;
-
-            Console.WriteLine($"\n\nYou have won {won}€.\nYour total is {moneyWon}€");
-            Console.Write("\n\nDo you want to continue playing [y/n]: ");
-            continuationKey = Console.ReadLine()!.ToLower();
-        } while (continuationKey == "y");
-        
-        return moneyWon;
-    }
-
-    private static int PlayRound(int moneyBet) {
+// ReSharper disable once ClassNeverInstantiated.Global
+public class Blackjack : CasinoGame {
+    protected override int PlayRound(int moneyBet) {
         List<int> cards = [];
-        var dealerHand = Random.Shared.Next(1, 21);
+        int dealerHand = Random.Shared.Next(1, 21);
 
         cards.Add(Random.Shared.Next(1, 11));
         cards.Add(Random.Shared.Next(1, 11));
 
         string playerTakes;
         do {
-            var yourCards = Array.ConvertAll<int, string>(cards.ToArray(), c => $"{CardToImage(c)} ({c.ToString()})");
+            string[] yourCards = Array.ConvertAll<int, string>(cards.ToArray(), c => $"{CardToImage(c)} ({c.ToString()})");
             Console.WriteLine("\nYour cards are: " + string.Join(", ", yourCards));
             Console.Write("Do you want to take a card [y/n]: ");
             playerTakes = Console.ReadLine()!.ToLower();
@@ -50,7 +25,7 @@ public static class Blackjack {
             dealerHand += Random.Shared.Next(1, 11);
         }
 
-        var playerHand = cards.Sum();
+        int playerHand = cards.Sum();
         Console.Write("\n\nYour hand is: " + playerHand);
         if (playerHand > 21) Console.Write(" (over)");
         Console.Write("\nThe dealer's hand is: " + dealerHand);
@@ -80,7 +55,7 @@ public static class Blackjack {
         };
     }
 
-    private static void PrintRules() {
+    protected override void PrintRules() {
         Console.WriteLine("Blackjack\n=========\n");
         
         Console.Write("Do you want to see the rules [y/n]: ");
