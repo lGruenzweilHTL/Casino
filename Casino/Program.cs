@@ -5,25 +5,31 @@ using Casino.Games;
 namespace Casino;
 
 internal static class Program {
-    private static void Main() {
+    public static int MoneyWon { get; private set; }
+    private static int Main() {
         // Planned games: Blackjack ✔, Kings ✔, Roulette
         
         Console.OutputEncoding = Encoding.Unicode;
         
         MenuLocation currentLocation = 0;
-        int moneyWon = 0;
 
         while (true) {
             Console.CursorVisible = false;
+
+            // Due to the new Windows Terminal on Win11, the console only clears the window and not the buffer
+            // you can clear the console's buffer with this escape sequence
+            // But it only works when you clear the window first (with Console.Clear())
             Console.Clear();
+            Console.WriteLine("\x1b[3J");
+
             DrawBorder();
             do {
-                DrawMenu(currentLocation, moneyWon);
+                DrawMenu(currentLocation, MoneyWon);
             } while (InteractWithMenu(ref currentLocation));
-            
-            if (currentLocation == MenuLocation.Quit) return;
 
-            moneyWon += currentLocation switch {
+            if (currentLocation == MenuLocation.Quit) return 0;
+
+            MoneyWon = currentLocation switch {
                 MenuLocation.Blackjack => new Blackjack().Play(),
                 MenuLocation.Kings => new Kings().Play(),
                 _ => 0
@@ -55,9 +61,11 @@ internal static class Program {
         string[] options = Enum.GetNames<MenuLocation>();
 
         for (int i = 0; i < options.Length; i++) {
-            Console.SetCursorPosition((Console.WindowWidth - options[i].Length) / 2, 10 + i * 3);
+            string styled = StyleMenuLocation((MenuLocation)i);
+            
+            Console.SetCursorPosition((Console.WindowWidth - styled.Length) / 2, 10 + i * 3);
             if (location.ToString() == options[i]) Console.ForegroundColor = ConsoleColor.Blue;
-            Console.Write(options[i]);
+            Console.Write(styled);
             Console.ForegroundColor = ConsoleColor.White;
         }
         
@@ -67,19 +75,27 @@ internal static class Program {
 
     private static bool InteractWithMenu(ref MenuLocation location) {
         ConsoleKey key = Console.ReadKey(true).Key;
-
+        
         switch (key) {
             case ConsoleKey.UpArrow:
                 location--;
-                if ((int)location == -1) location = (MenuLocation)Enum.GetNames<MenuLocation>().Length - 1;
                 break;
             case ConsoleKey.DownArrow:
-                location = (MenuLocation)(((int)location + 1) % Enum.GetNames<MenuLocation>().Length);
+                location++;
                 break;
             case ConsoleKey.Enter:
                 return false;
         }
+        int length = Enum.GetNames<MenuLocation>().Length;
+        location = (MenuLocation)(((int)location + length) % length);
 
         return true;
     }
+
+    private static string StyleMenuLocation(MenuLocation location) => location switch {
+        MenuLocation.Blackjack => "BLACKJACK",
+        MenuLocation.Kings => "KINGS",
+        MenuLocation.Quit => "QUIT",
+        _ => ""
+    };
 }

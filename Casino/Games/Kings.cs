@@ -2,43 +2,76 @@ namespace Casino.Games;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Kings : CasinoGame {
+    private const int NUMBER_BOTS = 3;
     protected override int PlayRound(int bet) {
-        const int numBots = 3;
-        bool playerIsIn = true;
-        int botsIn = numBots;
-        int playerBet = bet;
-        int totalMoney = bet * (numBots + 1);
+        int botsIn = NUMBER_BOTS;
+        int playerBet = 0;
+        int totalMoney = 0;
         int kingDice = 0;
         int kingIndex = -1;
+        bool roundOver = false;
 
+        // Condition doesn't cover all cases, because the 'break' keyword is used for exiting
+        while (botsIn > 0) {
+            playerBet += bet;
+            totalMoney += bet * (botsIn + 1);
 
-        while (playerIsIn && botsIn > 0) {
+            Console.WriteLine($"\n\nA new round has started:\nYour bet: {playerBet}\nTotal money: {totalMoney}");
+            string king = kingIndex switch {
+                -1 => "No one",
+                0 => "You",
+                _ => $"Bot {kingIndex}"
+            };
+            Console.WriteLine($"Current King: " + king);
+            Console.ReadKey(true);
+            
             // if you've been king or an entire round, you win
-            if (kingIndex == 0) break;
+            if (kingIndex == 0) {
+                Console.Write("You have won by being King for 1 round\n\nContinue...");
+                Console.ReadKey(true);
+                break;
+            }
 
             int playerDice = Random.Shared.Next(1, 7);
+            Console.WriteLine("\nYou have rolled: " + NumberToSymbol(playerDice));
             // if you roll 1, you're out
-            if (playerDice == 1) break;
+            if (playerDice == 1) {
+                Console.Write("You have lost by rolling a 1\n\nContinue...");
+                Console.ReadKey(true);
+                break;
+            }
 
             if (IsNewKing(playerDice, kingDice, out bool battle)) {
                 if (battle) {
+                    Console.WriteLine("\nYou have beaten a bot in battle");
                     botsIn--;
                 }
+                Console.WriteLine("You are now the King!");
                 kingIndex = 0;
                 kingDice = playerDice;
             }
             else if (battle) {
+                Console.Write("You have lost a battle. You're out\n\nContinue...");
+                Console.ReadKey(true);
                 break; // if you lose the battle, you're out
             }
+            Console.ReadKey(true);
 
             for (int i = 0; i < botsIn; i++) {
                 // if you've been king or an entire round, you win
-                if (kingIndex == i + 1) break;
+                if (kingIndex == i + 1) {
+                    Console.Write($"Bot {i+1} has won by being King for 1 round\n\nContinue...");
+                    Console.ReadKey(true);
+                    roundOver = true;
+                    break;
+                }
 
                 int botDice = Random.Shared.Next(1, 7);
+                Console.WriteLine($"\nBot {i+1} has rolled: " + NumberToSymbol(botDice));
                 // if you roll 1, you're out
                 if (botDice == 1) {
                     botsIn--;
+                    Console.WriteLine("A bot has been eliminated by rolling 1");
                     continue;
                 }
                 
@@ -46,21 +79,30 @@ public class Kings : CasinoGame {
                     if (wasBattle) {
                         if (kingIndex == 0) {
                             kingIndex = i + 1;
+                            Console.Write("You have lost a battle. You're out\n\nContinue...");
+                            Console.ReadKey(true);
+                            roundOver = true;
                             break;
                         }
 
+                        Console.WriteLine("A bot has fallen in battle");
                         botsIn--;
                         continue;
                     }
 
+                    Console.WriteLine($"Bot {i+1} is now the King!");
                     kingIndex = i + 1;
                     kingDice = botDice;
                 }
-                else if (wasBattle) botsIn--;
+                else if (wasBattle) {
+                    Console.WriteLine("A bot has fallen in battle");
+                    botsIn--;
+                }
+                
+                Console.ReadKey(true);
             }
-
-            playerBet += bet;
-            totalMoney += bet * (botsIn + 1);
+            
+            if (roundOver) break;
         }
 
         return kingIndex == 0 ? totalMoney : -playerBet;
@@ -69,20 +111,36 @@ public class Kings : CasinoGame {
     private static bool IsNewKing(int roll, int kingRoll, out bool wasBattle) {
         wasBattle = false;
 
+        if (kingRoll == roll) Console.WriteLine("A battle has started!");
         // equal means battle
         while (kingRoll == roll) {
             wasBattle = true;
             // In a battle, you roll until the rolls are not equal
             // The one who wins is king, the one who loses is out
             roll = Random.Shared.Next(1, 7);
+            kingRoll = Random.Shared.Next(1, 7);
+
+            Console.WriteLine($"Battle: King has rolled {NumberToSymbol(kingRoll)}. Contestant has rolled {NumberToSymbol(roll)}");
+            Console.ReadKey(true);
         }
 
-        // high beats low
-        if (roll > kingRoll) return true;
+        // 2 beats 6 (you need to check this first)
+        if (roll == 2 && kingRoll == 6) return true;
+        if (roll == 6 && kingRoll == 2) return false;
 
-        // 2 beats 6
-        return kingRoll == 6 && roll == 2;
+        // high beats low
+        return roll > kingRoll;
     }
+
+    private static char NumberToSymbol(int num) => num switch {
+        1 => '\u2460',
+        2 => '\u2461',
+        3 => '\u2462',
+        4 => '\u2463',
+        5 => '\u2464',
+        6 => '\u2465',
+        _ => '\0'
+    };
 
     protected override void PrintRules() {
         Console.WriteLine("Kings\n=====\n");
@@ -90,15 +148,14 @@ public class Kings : CasinoGame {
         Console.Write("Do you want to see the rules [y/n]: ");
         if (Console.ReadLine()!.ToLower() != "y") return;
 
-        Console.WriteLine("Every player rolls a dice (You will play against 3 bots)");
-        Console.WriteLine("The player with the highest roll becomes KING");
-        Console.WriteLine("But a 2 wins against a 6, so if the king has 6 and you have 2, you are the new king");
-        Console.WriteLine("If the king stays king until it's their turn again, he wins");
-        Console.WriteLine("If you roll a 1, you are completely out");
+        Console.WriteLine($"\n\nEvery player rolls a dice (You will play against {NUMBER_BOTS} bots)");
+        Console.WriteLine("\nThe player with the highest roll becomes KING");
+        Console.WriteLine("The values work in normal order, but 2 beats 6");
+        Console.WriteLine("If you roll a 1, you are out");
+        Console.WriteLine("\nIf the king stays king until it's their turn again, he wins");
         Console.WriteLine("\nIf you get the same roll as the king, you enter a battle");
         Console.WriteLine("In a battle, the one who rolls lower is completely out");
         Console.WriteLine("The winner of the battle becomes King");
-
         Console.WriteLine("\nAt the end of every round, your initial bet is added to the total");
 
         Console.Write("\n\nPress any key to continue...");

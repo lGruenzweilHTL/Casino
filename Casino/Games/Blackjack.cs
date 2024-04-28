@@ -11,8 +11,7 @@ public class Blackjack : CasinoGame {
 
         string playerTakes;
         do {
-            string[] yourCards = Array.ConvertAll<int, string>(cards.ToArray(), c => $"{CardToImage(c)} ({c.ToString()})");
-            Console.WriteLine("\nYour cards are: " + string.Join(", ", yourCards));
+            Console.WriteLine("\nYour cards are: " + FormatCards(cards));
             Console.Write("Do you want to take a card [y/n]: ");
             playerTakes = Console.ReadLine()!.ToLower();
 
@@ -20,6 +19,9 @@ public class Blackjack : CasinoGame {
                 cards.Add(Random.Shared.Next(1, 11));
             }
         } while (playerTakes == "y" && cards.Sum() <= 21);
+        
+        Console.WriteLine("\nYour final cards are: " + FormatCards(cards));
+
 
         while (DealerTakesCard(dealerHand)) {
             dealerHand += Random.Shared.Next(1, 11);
@@ -35,6 +37,10 @@ public class Blackjack : CasinoGame {
         if (dealerHand > 21) return moneyBet;
 
         return moneyBet * (playerHand > dealerHand ? 1 : -1);
+    }
+
+    private static string FormatCards(List<int> cards) {
+        return string.Join(", ", Array.ConvertAll<int, string>(cards.ToArray(), c => $"{CardToImage(c)} ({c.ToString()})"));
     }
 
     private static bool DealerTakesCard(int hand) => hand < 18;
@@ -57,7 +63,7 @@ public class Blackjack : CasinoGame {
 
     protected override void PrintRules() {
         Console.WriteLine("Blackjack\n=========\n");
-        
+
         Console.Write("Do you want to see the rules [y/n]: ");
         if (Console.ReadLine()!.ToLower() != "y") return;
 

@@ -3,7 +3,7 @@ namespace Casino;
 public abstract class CasinoGame {
     public virtual int Play() {
         Console.CursorVisible = true;
-        int moneyWon = 0;
+        int moneyWon = Program.MoneyWon;
         Console.Clear();
 
         PrintRules();
@@ -19,7 +19,8 @@ public abstract class CasinoGame {
             int won = PlayRound(bet);
             moneyWon += won;
 
-            Console.WriteLine($"\n\nYou have won {won}€.\nYour total is {moneyWon}€");
+            Console.WriteLine($"\n\nYou have {(won < 0 ? "lost" : "won")} {Math.Abs(won)}€.");
+            Console.WriteLine($"Your total is {moneyWon}€");
             Console.Write("\n\nDo you want to continue playing [y/n]: ");
             continuationKey = Console.ReadLine()!.ToLower();
         } while (continuationKey == "y");
