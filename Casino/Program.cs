@@ -7,8 +7,6 @@ namespace Casino;
 internal static class Program {
     public static int MoneyWon { get; private set; }
     private static int Main() {
-        // Planned games: Blackjack ✔, Kings ✔, Roulette
-        
         Console.OutputEncoding = Encoding.Unicode;
         
         MenuLocation currentLocation = 0;
@@ -32,6 +30,7 @@ internal static class Program {
             MoneyWon = currentLocation switch {
                 MenuLocation.Blackjack => new Blackjack().Play(),
                 MenuLocation.Kings => new Kings().Play(),
+                MenuLocation.Placeholder => new SlotMachine().Play(),
                 _ => 0
             };
         }
@@ -86,6 +85,7 @@ internal static class Program {
             case ConsoleKey.Enter:
                 return false;
         }
+        
         int length = Enum.GetNames<MenuLocation>().Length;
         location = (MenuLocation)(((int)location + length) % length);
 
@@ -93,9 +93,10 @@ internal static class Program {
     }
 
     private static string StyleMenuLocation(MenuLocation location) => location switch {
-        MenuLocation.Blackjack => "BLACKJACK",
-        MenuLocation.Kings => "KINGS",
-        MenuLocation.Quit => "QUIT",
+        MenuLocation.Blackjack => "Blackjack",
+        MenuLocation.Kings => "Kings",
+        MenuLocation.Placeholder => "Slot-Machine",
+        MenuLocation.Quit => "Quit (please play more)",
         _ => ""
     };
 }
