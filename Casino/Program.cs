@@ -6,9 +6,13 @@ namespace Casino;
 
 internal static class Program {
     public static int MoneyWon { get; private set; }
+
     private static int Main() {
         Console.OutputEncoding = Encoding.Unicode;
         
+        // Recover last session
+        if (FileSaver.TryReadMoneyWon(out int newMoney)) MoneyWon = newMoney;
+
         MenuLocation currentLocation = 0;
 
         while (true) {
@@ -25,13 +29,16 @@ internal static class Program {
                 DrawMenu(currentLocation, MoneyWon);
             } while (InteractWithMenu(ref currentLocation));
 
-            if (currentLocation == MenuLocation.Quit) return 0;
+            if (currentLocation == MenuLocation.Quit) {
+                FileSaver.SaveMoneyWon(MoneyWon);
+                return 0;
+            }
 
             MoneyWon = currentLocation switch {
                 MenuLocation.Blackjack => new Blackjack().Play(),
                 MenuLocation.Kings => new Kings().Play(),
-                MenuLocation.Placeholder => new SlotMachine().Play(),
-                _ => 0
+                MenuLocation.SlotMachine => new SlotMachine().Play(),
+                _ => MoneyWon
             };
         }
     }
@@ -60,21 +67,21 @@ internal static class Program {
         string[] options = Enum.GetNames<MenuLocation>();
 
         for (int i = 0; i < options.Length; i++) {
-            string styled = StyleMenuLocation((MenuLocation)i);
-            
+            string styled = StyleMenuLocation((MenuLocation)i) ?? options[i];
+
             Console.SetCursorPosition((Console.WindowWidth - styled.Length) / 2, 10 + i * 3);
             if (location.ToString() == options[i]) Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write(styled);
             Console.ForegroundColor = ConsoleColor.White;
         }
-        
+
         Console.SetCursorPosition(1, 1);
         Console.Write($"Total won: {moneyWon}€");
     }
 
     private static bool InteractWithMenu(ref MenuLocation location) {
         ConsoleKey key = Console.ReadKey(true).Key;
-        
+
         switch (key) {
             case ConsoleKey.UpArrow:
                 location--;
@@ -85,18 +92,16 @@ internal static class Program {
             case ConsoleKey.Enter:
                 return false;
         }
-        
+
         int length = Enum.GetNames<MenuLocation>().Length;
         location = (MenuLocation)(((int)location + length) % length);
 
         return true;
     }
 
-    private static string StyleMenuLocation(MenuLocation location) => location switch {
-        MenuLocation.Blackjack => "Blackjack",
-        MenuLocation.Kings => "Kings",
-        MenuLocation.Placeholder => "Slot-Machine",
-        MenuLocation.Quit => "Quit (please play more)",
-        _ => ""
+    private static string? StyleMenuLocation(MenuLocation location) => location switch {
+        MenuLocation.SlotMachine => "Slot-Machine",
+        MenuLocation.Quit => "Save and Quit",
+        _ => null
     };
 }

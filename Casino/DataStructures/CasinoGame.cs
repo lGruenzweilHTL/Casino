@@ -1,7 +1,7 @@
-namespace Casino;
+namespace Casino.DataStructures;
 
 public abstract class CasinoGame {
-    public virtual int Play() {
+    public int Play() {
         Console.CursorVisible = true;
         int moneyWon = Program.MoneyWon;
         Console.Clear();
@@ -11,10 +11,16 @@ public abstract class CasinoGame {
         string continuationKey;
         do {
             Console.Clear();
+            string inp = "";
             int bet;
             do {
                 Console.Write("Place your bet: ");
-            } while (!int.TryParse(Console.ReadLine()!, out bet));
+
+                inp = Console.ReadLine()!;
+            } while (!int.TryParse(inp, out bet) && inp.ToLower().Trim() != "all in");
+
+            bet = Math.Abs(bet);
+            if (inp.ToLower() == "all in") bet = moneyWon;
 
             int won = PlayRound(bet);
             moneyWon += won;

@@ -1,3 +1,5 @@
+using Casino.DataStructures;
+
 namespace Casino.Games;
 
 // ReSharper disable once ClassNeverInstantiated.Global

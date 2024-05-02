@@ -1,19 +1,31 @@
-using CasinoGame = Casino.CasinoGame;
+using Casino.DataStructures;
 
 namespace Casino.Games;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Blackjack : CasinoGame {
     protected override int PlayRound(int moneyBet) {
-        List<int> cards = [];
-        int dealerHand = Random.Shared.Next(1, 21);
+        List<int> cards = [
+            Random.Shared.Next(1, 11),
+            Random.Shared.Next(1, 11)
+        ];
+        if (AceWorth11(cards)) {
+            int ind = cards.IndexOf(1);
+            cards[ind] = 11;
+        }
+        
+        List<int> dealerCards = [
+            Random.Shared.Next(1, 11)
+        ];
 
-        cards.Add(Random.Shared.Next(1, 11));
-        cards.Add(Random.Shared.Next(1, 11));
+        Console.WriteLine(
+            $"\nThe dealer's cards are: {FormatCards(dealerCards.ToArray())}, \ud83c\udca0 (unknown)");
+        dealerCards.Add(Random.Shared.Next(1, 11));
+
 
         string playerTakes;
         do {
-            Console.WriteLine("\nYour cards are: " + FormatCards(cards));
+            Console.WriteLine("\nYour cards are: " + FormatCards(cards.ToArray()));
             Console.Write("Do you want to take a card [y/n]: ");
             playerTakes = Console.ReadLine()!.ToLower();
 
@@ -21,47 +33,66 @@ public class Blackjack : CasinoGame {
                 cards.Add(Random.Shared.Next(1, 11));
             }
         } while (playerTakes == "y" && cards.Sum() <= 21);
-        
-        Console.WriteLine("\nYour final cards are: " + FormatCards(cards));
 
+        Console.WriteLine("\nYour final cards are: " + FormatCards(cards.ToArray()));
+        int playerHand = cards.Sum();
 
-        while (DealerTakesCard(dealerHand)) {
-            dealerHand += Random.Shared.Next(1, 11);
+        Console.WriteLine();
+
+        if (playerHand <= 21) {
+            Console.WriteLine("The dealer's cards are: " + FormatCards(dealerCards.ToArray()));
+            while (DealerTakesCard(dealerCards.Sum())) {
+                int card = Random.Shared.Next(1, 11);
+                dealerCards.Add(card);
+
+                Thread.Sleep(1000);
+                Console.WriteLine($"The dealer took: {CardToImage(card)} ({card})");
+            }
+
+            Console.WriteLine("The dealer's final cards are: " + FormatCards(dealerCards.ToArray()));
+        }
+        else {
+            Console.WriteLine("You are over 21. You lose!");
+            return -moneyBet;
         }
 
-        int playerHand = cards.Sum();
+        int dealerHand = dealerCards.Sum();
         Console.Write("\n\nYour hand is: " + playerHand);
-        if (playerHand > 21) Console.Write(" (over)");
         Console.Write("\nThe dealer's hand is: " + dealerHand);
         if (dealerHand > 21) Console.Write(" (over)");
 
-        if (playerHand > 21) return -moneyBet;
         if (dealerHand > 21) return moneyBet;
 
         return moneyBet * (playerHand > dealerHand ? 1 : -1);
     }
 
-    private static string FormatCards(List<int> cards) {
-        return string.Join(", ", Array.ConvertAll<int, string>(cards.ToArray(), c => $"{CardToImage(c)} ({c.ToString()})"));
+    private static string FormatCards(params int[] cards) {
+        return string.Join(", ",
+            Array.ConvertAll<int, string>(cards, c => $"{CardToImage(c)} ({c.ToString()})"));
     }
 
     private static bool DealerTakesCard(int hand) => hand < 18;
 
-    private static string CardToImage(int card) {
-        return card switch {
-            1 => "\ud83c\udca1",
-            2 => "\ud83c\udca2",
-            3 => "\ud83c\udca3",
-            4 => "\ud83c\udca4",
-            5 => "\ud83c\udca5",
-            6 => "\ud83c\udca6",
-            7 => "\ud83c\udca7",
-            8 => "\ud83c\udca8",
-            9 => "\ud83c\udca9",
-            10 => "\ud83c\udcaa",
-            _ => ""
-        };
+    private static bool AceWorth11(List<int> hand) {
+        if (hand.Count != 2) return false;
+        return (hand[0] == 1 && hand[1] == 10) || (hand[0] == 10 && hand[1] == 1);
     }
+
+    private static string CardToImage(int card) => card switch {
+        1 => "\ud83c\udca1",
+        2 => "\ud83c\udca2",
+        3 => "\ud83c\udca3",
+        4 => "\ud83c\udca4",
+        5 => "\ud83c\udca5",
+        6 => "\ud83c\udca6",
+        7 => "\ud83c\udca7",
+        8 => "\ud83c\udca8",
+        9 => "\ud83c\udca9",
+        10 => "\ud83c\udcaa",
+        11 => "\ud83c\udca1", // Ace
+        _ => ""
+    };
+
 
     protected override void PrintRules() {
         Console.WriteLine("Blackjack\n=========\n");
@@ -76,10 +107,9 @@ public class Blackjack : CasinoGame {
         Console.WriteLine("If you are over 21, you immediately lose");
 
         Console.WriteLine("\n\nCards:\n");
-        Console.WriteLine("Every card is worth their value");
-        Console.WriteLine("In normal Blackjack, the value of aces can change");
-        Console.WriteLine("Here, it's always 1");
-        Console.WriteLine("There are also no Jacks, Queens or Kings");
+        Console.WriteLine("Every card is worth their numeric value");
+        Console.WriteLine("If an ace appears with a ten, it's worth 11");
+        Console.WriteLine("There are no Jacks, Queens or Kings");
 
         Console.Write("\n\nPress any key to continue...");
         Console.ReadKey(true);

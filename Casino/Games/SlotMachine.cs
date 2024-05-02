@@ -1,3 +1,5 @@
+using Casino.DataStructures;
+
 namespace Casino.Games;
 
 public class SlotMachine : CasinoGame {
