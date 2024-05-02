@@ -21,6 +21,10 @@ public class Blackjack : CasinoGame {
         Console.WriteLine(
             $"\nThe dealer's cards are: {FormatCards(dealerCards.ToArray())}, \ud83c\udca0 (unknown)");
         dealerCards.Add(Random.Shared.Next(1, 11));
+        if (AceWorth11(dealerCards)) {
+            int ind = cards.IndexOf(1);
+            dealerCards[ind] = 11;
+        }
 
 
         string playerTakes;

@@ -2,7 +2,7 @@ namespace Casino;
 
 public static class FileSaver {
     private const string DIRECTORY = @"C:\Gambling";
-    private const string FILE = @"\Session.json";
+    private const string FILE = @"\Session.save";
     public static void SaveMoneyWon(int money) {
         string path = DIRECTORY + FILE;
         if (!Directory.Exists(DIRECTORY)) Directory.CreateDirectory(DIRECTORY);
