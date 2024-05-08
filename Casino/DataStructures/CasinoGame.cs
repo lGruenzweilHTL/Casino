@@ -25,8 +25,8 @@ public abstract class CasinoGame {
             int won = PlayRound(bet);
             moneyWon += won;
 
-            Console.WriteLine($"\n\nYou have {(won < 0 ? "lost" : "won")} {Math.Abs(won)}€.");
-            Console.WriteLine($"Your total is {moneyWon}€");
+            Console.WriteLine($"\n\nYou have {(won < 0 ? "lost" : "won")} {Math.Abs(won)}🪙.");
+            Console.WriteLine($"Your total is {moneyWon}🪙");
             Console.Write("\n\nDo you want to continue playing [y/n]: ");
             continuationKey = Console.ReadLine()!.ToLower();
         } while (continuationKey == "y");

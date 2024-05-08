@@ -11,7 +11,7 @@ internal static class Program {
         Console.OutputEncoding = Encoding.Unicode;
         
         // Recover last session
-        if (FileSaver.TryReadMoneyWon(out int newMoney)) MoneyWon = newMoney;
+        if (FileSaver.TryReadNumber(out int newMoney)) MoneyWon = newMoney;
 
         MenuLocation currentLocation = 0;
 
@@ -20,7 +20,7 @@ internal static class Program {
 
             // Due to the new Windows Terminal on Win11, the console only clears the window and not the buffer
             // you can clear the console's buffer with this escape sequence
-            // But it only works when you clear the window first (with Console.Clear())
+            // To clear the window and the offscreen buffer, use it in combination with Console.Clear
             Console.Clear();
             Console.WriteLine("\x1b[3J");
 
@@ -30,7 +30,7 @@ internal static class Program {
             } while (InteractWithMenu(ref currentLocation));
 
             if (currentLocation == MenuLocation.Quit) {
-                FileSaver.SaveMoneyWon(MoneyWon);
+                FileSaver.SaveNumber(MoneyWon);
                 return 0;
             }
 
@@ -76,7 +76,7 @@ internal static class Program {
         }
 
         Console.SetCursorPosition(1, 1);
-        Console.Write($"Total won: {moneyWon}€");
+        Console.Write($"Total won: {moneyWon}🪙");
     }
 
     private static bool InteractWithMenu(ref MenuLocation location) {
