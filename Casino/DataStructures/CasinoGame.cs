@@ -20,7 +20,7 @@ public abstract class CasinoGame {
             } while (!int.TryParse(inp, out bet) && inp.ToLower().Trim() != "all in");
 
             bet = Math.Abs(bet);
-            if (inp.ToLower() == "all in") bet = moneyWon;
+            if (inp.ToLower() == "all in") bet = Math.Abs(moneyWon);
 
             int won = PlayRound(bet);
             moneyWon += won;
