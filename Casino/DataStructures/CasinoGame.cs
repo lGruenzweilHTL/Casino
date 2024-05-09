@@ -4,13 +4,13 @@ public abstract class CasinoGame {
     public int Play() {
         Console.CursorVisible = true;
         int moneyWon = Program.MoneyWon;
-        Console.Clear();
+        Utils.ClearConsoleBuffer();
 
         PrintRules();
 
         string continuationKey;
         do {
-            Console.Clear();
+            Utils.ClearConsoleBuffer();
             string inp = "";
             int bet;
             do {
