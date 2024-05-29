@@ -9,11 +9,11 @@ internal static class Program {
 
     private static int Main() {
         Console.OutputEncoding = Encoding.Unicode;
-        
-        // Recover last session
-        if (FileSaver.TryReadNumber(out int newMoney)) MoneyWon = newMoney;
 
-        MenuLocation currentLocation = 0;
+        // Recover last session
+        { if (FileSaver.TryReadNumber(out int newMoney)) MoneyWon = newMoney; }
+
+        MenuLocation menuLocation = 0;
 
         while (true) {
             Console.CursorVisible = false;
@@ -22,15 +22,15 @@ internal static class Program {
 
             DrawBorder();
             do {
-                DrawMenu(currentLocation, MoneyWon);
-            } while (InteractWithMenu(ref currentLocation));
+                DrawMenu(menuLocation, MoneyWon);
+            } while (InteractWithMenu(ref menuLocation));
 
-            if (currentLocation == MenuLocation.Quit) {
+            if (menuLocation == MenuLocation.Quit) {
                 FileSaver.SaveNumber(MoneyWon);
                 return 0;
             }
 
-            MoneyWon = currentLocation switch {
+            MoneyWon = menuLocation switch {
                 MenuLocation.Blackjack => new Blackjack().Play(),
                 MenuLocation.Kings => new Kings().Play(),
                 MenuLocation.SlotMachine => new SlotMachine().Play(),
@@ -78,6 +78,7 @@ internal static class Program {
     private static bool InteractWithMenu(ref MenuLocation location) {
         ConsoleKey key = Console.ReadKey(true).Key;
 
+        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
         switch (key) {
             case ConsoleKey.UpArrow:
                 location--;
