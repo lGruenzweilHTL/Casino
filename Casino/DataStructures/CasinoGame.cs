@@ -23,8 +23,17 @@ public abstract class CasinoGame {
     }
 
     protected virtual void PrintPayout(int total, int won) {
-        Console.WriteLine($"\n\nYou have {(won < 0 ? "lost" : "won")} {Math.Abs(won)}🪙.");
+        Thread sound;
+        if (won < 0) {
+            sound = AudioManager.PlayAudio("Media\\fail.mp3");
+            Console.WriteLine($"\n\nYou lost {-won}🪙.");
+        }
+        else {
+            sound = AudioManager.PlayAudio("Media\\coinSound.mp3");
+            Console.WriteLine($"\n\nYou have won {won}🪙.");
+        }
         Console.WriteLine($"Your total is {total}🪙");
+        sound.Join(); // Wait for the sound to finish
         Console.Write("\n\nDo you want to continue playing [y/n]: ");
     }
 

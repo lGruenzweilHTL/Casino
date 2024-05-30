@@ -5,6 +5,12 @@ using Casino.Games;
 namespace Casino;
 
 internal static class Program {
+    // todo:
+    // roulette
+    // more unicode
+    // sfx
+    // scoreboard
+    
     public static int MoneyWon { get; private set; }
 
     private static int Main() {

@@ -7,4 +7,17 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="NAudio" Version="2.2.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Media\coinSound.mp3">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Media\fail.mp3">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
