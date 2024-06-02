@@ -23,17 +23,17 @@ public class Roulette : CasinoGame {
 
     protected override int PlayRound(int bet) {
         int result = Random.Shared.Next(1, 37);
-        for (double i = 0; i < Math.Tau; i += Math.PI / 5) {
+        AudioManager.PlayAudio("Media\\Roulette.mp3");
+        for (int i = 0; i < 30; i++) {
             DrawRouletteWheel(CurrentLayout, i);
             Thread.Sleep(100);
         }
         
-        // TODO: find a good solution to make wheel stop on correct number
+        // TODO: find solution without rotating array (will also fix error)
         int arrayRotation = CurrentLayout.Length - Array.IndexOf(CurrentLayout, result);
         DrawRouletteWheel(RotateArray(CurrentLayout, arrayRotation), 0);
 
-        Console.SetCursorPosition(0, Console.WindowHeight - 1);
-        Console.WriteLine(result);
+        Console.SetCursorPosition(0, Console.WindowHeight - 1); // reset cursor
         return CalculatePayout(IsBetWinning(_betType, result, _betNumber), _betType, bet);
     }
 

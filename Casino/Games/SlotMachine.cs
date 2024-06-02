@@ -14,7 +14,8 @@ public class SlotMachine : CasinoGame {
         
         Console.Write("Press any key to start...");
         Console.ReadKey(true);
-        
+
+        AudioManager.PlayAudio("Media\\slotMachine.mp3");
         PrintMachine();
         RenderResult(result);
 

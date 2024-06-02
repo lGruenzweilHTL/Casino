@@ -5,6 +5,13 @@ namespace Casino.Games;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class Blackjack : CasinoGame {
     protected override int PlayRound(int moneyBet) {
+        Console.WriteLine("Shuffling...");
+        AudioManager.PlayAudio("Media\\shuffle.mp3").Join();
+        Console.WriteLine("Dealing cards...");
+        AudioManager.PlayAudio("Media\\card.mp3").Join();
+        AudioManager.PlayAudio("Media\\card.mp3").Join();
+        
+        
         List<int> cards = [
             Random.Shared.Next(1, 11),
             Random.Shared.Next(1, 11)
@@ -35,6 +42,7 @@ public class Blackjack : CasinoGame {
 
             if (playerTakes == "y") {
                 cards.Add(Random.Shared.Next(1, 11));
+                AudioManager.PlayAudio("Media\\card.mp3").Join();
             }
         } while (playerTakes == "y" && cards.Sum() <= 21);
 
@@ -49,8 +57,9 @@ public class Blackjack : CasinoGame {
                 int card = Random.Shared.Next(1, 11);
                 dealerCards.Add(card);
 
-                Thread.Sleep(1000);
+                Thread.Sleep(750);
                 Console.WriteLine($"The dealer took: {CardToImage(card)} ({card})");
+                AudioManager.PlayAudio("Media\\card.mp3").Join();
             }
 
             Console.WriteLine("The dealer's final cards are: " + FormatCards(dealerCards.ToArray()));

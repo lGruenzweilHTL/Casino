@@ -5,11 +5,6 @@ using Casino.Games;
 namespace Casino;
 
 internal static class Program {
-    // todo:
-    // more unicode
-    // sfx
-    // scoreboard
-
     private const int MENU_OFFSET_Y = 8;
     private const int MENU_SPACING = 3;
     
@@ -20,7 +15,8 @@ internal static class Program {
 
         // Recover last session
         { if (FileSaver.TryReadNumber(out int newMoney)) MoneyWon = newMoney; }
-
+        
+        //AudioManager.PlayAudio("Media\\casino-intro.mp3");
         MenuLocation menuLocation = 0;
 
         while (true) {
