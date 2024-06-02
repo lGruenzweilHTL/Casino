@@ -6,10 +6,12 @@ namespace Casino;
 
 internal static class Program {
     // todo:
-    // roulette
     // more unicode
     // sfx
     // scoreboard
+
+    private const int MENU_OFFSET_Y = 8;
+    private const int MENU_SPACING = 3;
     
     public static int MoneyWon { get; private set; }
 
@@ -40,6 +42,7 @@ internal static class Program {
                 MenuLocation.Blackjack => new Blackjack().Play(),
                 MenuLocation.Kings => new Kings().Play(),
                 MenuLocation.SlotMachine => new SlotMachine().Play(),
+                MenuLocation.Roulette => new Roulette().Play(),
                 _ => MoneyWon
             };
         }
@@ -71,7 +74,7 @@ internal static class Program {
         for (int i = 0; i < options.Length; i++) {
             string styled = StyleMenuLocation((MenuLocation)i) ?? options[i];
 
-            Console.SetCursorPosition((Console.WindowWidth - styled.Length) / 2, 10 + i * 3);
+            Console.SetCursorPosition((Console.WindowWidth - styled.Length) / 2, MENU_OFFSET_Y + i * MENU_SPACING);
             if (location.ToString() == options[i]) Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write(styled);
             Console.ForegroundColor = ConsoleColor.White;

@@ -12,7 +12,7 @@ public abstract class CasinoGame {
         do {
             Utils.ClearConsoleBuffer();
 
-            int won = PlayRound(ReadBet(moneyWon));
+            int won = PlayRound(ReadBet());
             moneyWon += won;
 
             PrintPayout(moneyWon, won);
@@ -32,24 +32,14 @@ public abstract class CasinoGame {
             sound = AudioManager.PlayAudio("Media\\coinSound.mp3");
             Console.WriteLine($"\n\nYou have won {won}🪙.");
         }
+
         Console.WriteLine($"Your total is {total}🪙");
         sound.Join(); // Wait for the sound to finish
         Console.Write("\n\nDo you want to continue playing [y/n]: ");
     }
 
-    protected virtual int ReadBet(int allInValue) {
-        string inp = "";
-        int bet;
-        do {
-            Console.Write("Place your bet: ");
-
-            inp = Console.ReadLine()!;
-        } while (!int.TryParse(inp, out bet) && inp.ToLower().Trim() != "all in");
-
-        bet = Math.Abs(bet);
-        if (inp.ToLower() == "all in") bet = Math.Abs(allInValue);
-
-        return bet;
+    protected virtual int ReadBet() {
+        return InputReader.ReadInputOfType<int>("Place your bet: ", "Invalid input", i => i > 0);
     }
 
     protected abstract int PlayRound(int bet);

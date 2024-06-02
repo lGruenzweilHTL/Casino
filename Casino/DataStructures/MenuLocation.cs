@@ -1,5 +1,5 @@
 namespace Casino.DataStructures;
 
 public enum MenuLocation {
-    Blackjack, Kings, SlotMachine, Quit
+    Blackjack, Kings, SlotMachine, Roulette, Quit
 }
