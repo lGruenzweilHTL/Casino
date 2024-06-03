@@ -1,4 +1,4 @@
-namespace Casino;
+namespace Casino.Systems;
 
 public static class InputReader {
     public static T ReadInputOfType<T>(string prompt, string invalidMsg = "Invalid input", Predicate<T>? predicate = null)

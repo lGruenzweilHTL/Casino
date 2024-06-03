@@ -1,22 +1,27 @@
-﻿using System.Text;
+﻿using System.Numerics;
+using System.Text;
 using Casino.DataStructures;
 using Casino.Games;
+using Casino.Systems;
 
 namespace Casino;
 
 internal static class Program {
     private const int MENU_OFFSET_Y = 8;
     private const int MENU_SPACING = 3;
+    private const int SCOREBOARD_OFFSET_Y = 10;
+    private const int SCOREBOARD_SPACING = 1;
+    private const int SCOREBOARD_POSITION_X = 75;
     
-    public static int MoneyWon { get; private set; }
+    public static BigInteger MoneyWon { get; private set; }
 
     private static int Main() {
         Console.OutputEncoding = Encoding.Unicode;
 
         // Recover last session
-        { if (FileSaver.TryReadNumber(out int newMoney)) MoneyWon = newMoney; }
+        { if (FileSaver.TryReadNumber(out BigInteger newMoney)) MoneyWon = newMoney; }
         
-        //AudioManager.PlayAudio("Media\\casino-intro.mp3");
+        AudioManager.PlayAudio("Media\\casino-intro.mp3");
         MenuLocation menuLocation = 0;
 
         while (true) {
@@ -64,7 +69,7 @@ internal static class Program {
         }
     }
 
-    private static void DrawMenu(MenuLocation location, int moneyWon) {
+    private static void DrawMenu(MenuLocation location, BigInteger moneyWon) {
         string[] options = Enum.GetNames<MenuLocation>();
 
         for (int i = 0; i < options.Length; i++) {

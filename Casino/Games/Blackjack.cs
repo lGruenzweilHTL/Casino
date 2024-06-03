@@ -1,10 +1,11 @@
+using System.Numerics;
 using Casino.DataStructures;
+using Casino.Systems;
 
 namespace Casino.Games;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class Blackjack : CasinoGame {
-    protected override int PlayRound(int moneyBet) {
+    protected override BigInteger PlayRound(BigInteger moneyBet) {
         Console.WriteLine("Shuffling...");
         AudioManager.PlayAudio("Media\\shuffle.mp3").Join();
         Console.WriteLine("Dealing cards...");
@@ -42,7 +43,7 @@ public class Blackjack : CasinoGame {
 
             if (playerTakes == "y") {
                 cards.Add(Random.Shared.Next(1, 11));
-                AudioManager.PlayAudio("Media\\card.mp3").Join();
+                AudioManager.PlayAudio("Media\\card.mp3");
             }
         } while (playerTakes == "y" && cards.Sum() <= 21);
 
@@ -56,8 +57,7 @@ public class Blackjack : CasinoGame {
             while (DealerTakesCard(dealerCards.Sum())) {
                 int card = Random.Shared.Next(1, 11);
                 dealerCards.Add(card);
-
-                Thread.Sleep(750);
+                
                 Console.WriteLine($"The dealer took: {CardToImage(card)} ({card})");
                 AudioManager.PlayAudio("Media\\card.mp3").Join();
             }

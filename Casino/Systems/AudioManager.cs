@@ -1,6 +1,6 @@
 using NAudio.Wave;
 
-namespace Casino;
+namespace Casino.Systems;
 
 public static class AudioManager {
     /// <summary>

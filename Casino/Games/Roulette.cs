@@ -1,4 +1,6 @@
+using System.Numerics;
 using Casino.DataStructures;
+using Casino.Systems;
 
 namespace Casino.Games;
 
@@ -21,7 +23,7 @@ public class Roulette : CasinoGame {
         [31] = '\u325b', [32] = '\u325c', [33] = '\u325d', [34] = '\u325e', [35] = '\u325f', [36] = '\u32b1',
     };
 
-    protected override int PlayRound(int bet) {
+    protected override BigInteger PlayRound(BigInteger bet) {
         int result = Random.Shared.Next(1, 37);
         AudioManager.PlayAudio("Media\\Roulette.mp3");
         for (int i = 0; i < 30; i++) {
@@ -29,7 +31,7 @@ public class Roulette : CasinoGame {
             Thread.Sleep(100);
         }
         
-        // TODO: find solution without rotating array (will also fix error)
+        // TODO: find solution without rotating array (will also fix error with colors)
         int arrayRotation = CurrentLayout.Length - Array.IndexOf(CurrentLayout, result);
         DrawRouletteWheel(RotateArray(CurrentLayout, arrayRotation), 0);
 
@@ -53,9 +55,9 @@ public class Roulette : CasinoGame {
         };
     }
 
-    private static int CalculatePayout(bool won, RouletteBettingType type, int bet) {
+    private static BigInteger CalculatePayout(bool won, RouletteBettingType type, BigInteger bet) {
         if (!won) return -bet;
-        return type switch {
+        return bet * type switch {
             RouletteBettingType.Even or RouletteBettingType.Odd or RouletteBettingType.High
                 or RouletteBettingType.Low or RouletteBettingType.Red or RouletteBettingType.Black => 1,
             RouletteBettingType.First12 or RouletteBettingType.Second12 or RouletteBettingType.Third12 => 3,
@@ -65,7 +67,7 @@ public class Roulette : CasinoGame {
     }
 
 
-    protected override int ReadBet() {
+    protected override BigInteger ReadBet() {
         string bettingTypes = string.Join(", ", Enum.GetNames<RouletteBettingType>());
         do {
             Console.Write($"What do you want to bet on [{bettingTypes}]: ");
@@ -90,9 +92,9 @@ public class Roulette : CasinoGame {
         double angleStep = Math.Tau / numPoints;
 
         for (int i = 0; i < numPoints; i++) {
-            double angle = (i * angleStep) + angleRad;
-            int x = (int)Math.Round(CENTER_X + RADIUS * Math.Sin(angle) * 2);
-            int y = (int)Math.Round(CENTER_Y + RADIUS * Math.Cos(angle));
+            double angle = i * angleStep + angleRad;
+            int x = (int)(CENTER_X + RADIUS * Math.Sin(angle) * 2);
+            int y = (int)(CENTER_Y + RADIUS * Math.Cos(angle));
 
             Console.ForegroundColor = layout[i] == 0
                 ? ConsoleColor.Green

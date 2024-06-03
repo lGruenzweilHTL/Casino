@@ -1,14 +1,16 @@
+using System.Numerics;
 using Casino.DataStructures;
+using Casino.Systems;
 
 namespace Casino.Games;
 
-// ReSharper disable once ClassNeverInstantiated.Global
 public class Kings : CasinoGame {
     private const int NUMBER_BOTS = 3;
-    protected override int PlayRound(int bet) {
+
+    protected override BigInteger PlayRound(BigInteger bet) {
         int botsIn = NUMBER_BOTS;
-        int playerBet = 0;
-        int totalMoney = 0;
+        BigInteger playerBet = 0;
+        BigInteger totalMoney = 0;
         int kingDice = 0;
         int kingIndex = -1;
         bool roundOver = false;

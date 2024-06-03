@@ -1,4 +1,4 @@
-namespace Casino;
+namespace Casino.Systems;
 
 public static class Utils {
     public static void ClearConsoleBuffer() {

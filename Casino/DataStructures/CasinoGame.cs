@@ -1,9 +1,12 @@
+using System.Numerics;
+using Casino.Systems;
+
 namespace Casino.DataStructures;
 
 public abstract class CasinoGame {
-    public int Play() {
+    public BigInteger Play() {
         Console.CursorVisible = true;
-        int moneyWon = Program.MoneyWon;
+        BigInteger moneyWon = Program.MoneyWon;
         Utils.ClearConsoleBuffer();
 
         PrintRules();
@@ -12,7 +15,7 @@ public abstract class CasinoGame {
         do {
             Utils.ClearConsoleBuffer();
 
-            int won = PlayRound(ReadBet());
+            BigInteger won = PlayRound(ReadBet());
             moneyWon += won;
 
             PrintPayout(moneyWon, won);
@@ -22,7 +25,7 @@ public abstract class CasinoGame {
         return moneyWon;
     }
 
-    protected virtual void PrintPayout(int total, int won) {
+    protected virtual void PrintPayout(BigInteger total, BigInteger won) {
         Thread sound;
         if (won < 0) {
             sound = AudioManager.PlayAudio("Media\\fail.mp3");
@@ -38,10 +41,10 @@ public abstract class CasinoGame {
         Console.Write("\n\nDo you want to continue playing [y/n]: ");
     }
 
-    protected virtual int ReadBet() {
-        return InputReader.ReadInputOfType<int>("Place your bet: ", "Invalid input", i => i > 0);
+    protected virtual BigInteger ReadBet() {
+        return InputReader.ReadInputOfType<BigInteger>($"Place your bet: ", "Invalid input", i => i > 0);
     }
 
-    protected abstract int PlayRound(int bet);
+    protected abstract BigInteger PlayRound(BigInteger bet);
     protected virtual void PrintRules() { }
 }

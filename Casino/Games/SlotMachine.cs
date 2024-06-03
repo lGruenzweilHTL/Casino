@@ -1,11 +1,14 @@
+using System.Numerics;
 using Casino.DataStructures;
+using Casino.Systems;
 
 namespace Casino.Games;
 
 public class SlotMachine : CasinoGame {
     private const int NUMBER_SLOTS = 3;
     private const int NUMBER_ITEMS = 10;
-    protected override int PlayRound(int bet) {
+
+    protected override BigInteger PlayRound(BigInteger bet) {
         int[] result = new int[NUMBER_SLOTS];
         
         for (int i = 0; i < result.Length; i++) {
@@ -19,7 +22,7 @@ public class SlotMachine : CasinoGame {
         PrintMachine();
         RenderResult(result);
 
-        return (int)(bet * CalculateMoneyMultiplier(result));
+        return bet * CalculateMoneyMultiplier(result);
     }
 
     private static void RenderResult(int[] res) {
@@ -46,7 +49,7 @@ public class SlotMachine : CasinoGame {
         Console.Write(SlotToIcon(item));
     }
 
-    private static double CalculateMoneyMultiplier(int[] items) {
+    private static int CalculateMoneyMultiplier(int[] items) {
         int same = (from i in items
             let count = items.Count(n => n == i)
             select count).Max();
