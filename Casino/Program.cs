@@ -9,18 +9,20 @@ namespace Casino;
 internal static class Program {
     private const int MENU_OFFSET_Y = 8;
     private const int MENU_SPACING = 3;
-    private const int SCOREBOARD_OFFSET_Y = 10;
+    private const int SCOREBOARD_POSITION_Y = 10;
     private const int SCOREBOARD_SPACING = 1;
-    private const int SCOREBOARD_POSITION_X = 75;
-    
+    private const int SCOREBOARD_POSITION_X = 85;
+    private const int SCORES_POSITION_X = SCOREBOARD_POSITION_X + 15;
+
     public static BigInteger MoneyWon { get; private set; }
+    private static string _username = "";
 
     private static int Main() {
         Console.OutputEncoding = Encoding.Unicode;
 
         // Recover last session
-        { if (FileSaver.TryReadNumber(out BigInteger newMoney)) MoneyWon = newMoney; }
-        
+        MoneyWon = TitleScreen();
+
         AudioManager.PlayAudio("Media\\casino-intro.mp3");
         MenuLocation menuLocation = 0;
 
@@ -35,7 +37,10 @@ internal static class Program {
             } while (InteractWithMenu(ref menuLocation));
 
             if (menuLocation == MenuLocation.Quit) {
-                FileSaver.SaveNumber(MoneyWon);
+                List<string> scores = File.ReadAllLines("Scores.csv").ToList();
+                scores.RemoveAll(p => p.Split(';')[0] == _username);
+                
+                File.WriteAllLines("Scores.csv", scores.Append($"{_username};{MoneyWon}"));
                 return 0;
             }
 
@@ -47,6 +52,26 @@ internal static class Program {
                 _ => MoneyWon
             };
         }
+    }
+
+    // Displays title screen. Returns: current money (1000 as default)
+    private static BigInteger TitleScreen() {
+        // Write logo
+        Console.WriteLine(File.ReadAllText("Logo.txt"));
+        Console.Write("\n\n\nEnter username: ");
+
+        string name = Console.ReadLine() ?? $"User {Random.Shared.Next(0, 10000)}";
+        _username = name;
+        string[][] players = File.ReadAllLines("Scores.csv")
+            .Select(s => s.Split(';'))
+            .ToArray();
+        foreach (string[] data in players) {
+            if (name == data[0]) {
+                return BigInteger.Parse(data[1]);
+            }
+        }
+
+        return 1000; // Starting money
     }
 
     private static void DrawBorder() {
@@ -83,6 +108,7 @@ internal static class Program {
 
         Console.SetCursorPosition(1, 1);
         Console.Write($"Total won: {moneyWon}🪙");
+        DrawScoreboard(5);
     }
 
     private static bool InteractWithMenu(ref MenuLocation location) {
@@ -111,4 +137,28 @@ internal static class Program {
         MenuLocation.Quit => "Save and Quit",
         _ => null
     };
+
+    private static void DrawScoreboard(int maxNumPlayers) {
+        const string FILENAME = "Scores.csv";
+        if (!File.Exists(FILENAME)) return;
+        string[][] scores = File.ReadAllLines(FILENAME)
+            .Select(s => s.Split(';'))
+            .OrderBy(s => int.Parse(s[^1]))
+            .Reverse()
+            .ToArray();
+
+        // Header
+        Console.SetCursorPosition(SCOREBOARD_POSITION_X, SCOREBOARD_POSITION_Y);
+        Console.Write("Player");
+        Console.SetCursorPosition(SCORES_POSITION_X, SCOREBOARD_POSITION_Y);
+        Console.Write("Scores");
+
+        // Contents
+        for (int i = 0; i < scores.Length && i < maxNumPlayers; i++) {
+            Console.SetCursorPosition(SCOREBOARD_POSITION_X, SCOREBOARD_POSITION_Y + (i + 1) * SCOREBOARD_SPACING);
+            Console.Write(scores[i][0]);
+            Console.SetCursorPosition(SCORES_POSITION_X, SCOREBOARD_POSITION_Y + (i + 1) * SCOREBOARD_SPACING);
+            Console.Write(scores[i][1]);
+        }
+    }
 }
