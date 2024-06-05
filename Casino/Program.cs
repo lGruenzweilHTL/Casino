@@ -12,7 +12,7 @@ internal static class Program {
     private static int ScoreboardPositionY => Console.WindowHeight - SCOREBOARD_NUM_PLAYERS - 4;
     private const int SCOREBOARD_NUM_PLAYERS = 5;
     private const int SCOREBOARD_SPACING = 1;
-    private const int SCOREBOARD_POSITION_X = 1;
+    private const int SCOREBOARD_POSITION_X = 2;
     private const int SCORES_POSITION_X = SCOREBOARD_POSITION_X + 30;
 
     public static BigInteger MoneyWon { get; private set; }
