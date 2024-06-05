@@ -42,7 +42,8 @@ public abstract class CasinoGame {
     }
 
     protected virtual BigInteger ReadBet() {
-        return InputReader.ReadInputOfType<BigInteger>($"Place your bet: ", "Invalid input", i => i > 0);
+        const long BETTING_LIMIT = 1_000_000_000_000_000_000;
+        return InputReader.ReadInputOfType<BigInteger>($"Place your bet [0..{BETTING_LIMIT}]: ", "Invalid input", i => i > 0 && i <= BETTING_LIMIT);
     }
 
     protected abstract BigInteger PlayRound(BigInteger bet);

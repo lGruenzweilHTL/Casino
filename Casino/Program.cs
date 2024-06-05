@@ -7,12 +7,13 @@ using Casino.Systems;
 namespace Casino;
 
 internal static class Program {
-    private const int MENU_OFFSET_Y = 8;
+    private static int MenuOffsetY => Console.WindowHeight / Enum.GetNames<MenuLocation>().Length;
     private const int MENU_SPACING = 3;
-    private const int SCOREBOARD_POSITION_Y = 10;
+    private static int ScoreboardPositionY => Console.WindowHeight - SCOREBOARD_NUM_PLAYERS - 4;
+    private const int SCOREBOARD_NUM_PLAYERS = 5;
     private const int SCOREBOARD_SPACING = 1;
-    private const int SCOREBOARD_POSITION_X = 85;
-    private const int SCORES_POSITION_X = SCOREBOARD_POSITION_X + 15;
+    private const int SCOREBOARD_POSITION_X = 1;
+    private const int SCORES_POSITION_X = SCOREBOARD_POSITION_X + 30;
 
     public static BigInteger MoneyWon { get; private set; }
     private static string _username = "";
@@ -100,15 +101,15 @@ internal static class Program {
         for (int i = 0; i < options.Length; i++) {
             string styled = StyleMenuLocation((MenuLocation)i) ?? options[i];
 
-            Console.SetCursorPosition((Console.WindowWidth - styled.Length) / 2, MENU_OFFSET_Y + i * MENU_SPACING);
+            Console.SetCursorPosition((Console.WindowWidth - styled.Length) / 2, MenuOffsetY + i * MENU_SPACING);
             if (location.ToString() == options[i]) Console.ForegroundColor = ConsoleColor.Blue;
             Console.Write(styled);
             Console.ForegroundColor = ConsoleColor.White;
         }
 
         Console.SetCursorPosition(1, 1);
-        Console.Write($"Total won: {moneyWon}🪙");
-        DrawScoreboard(5);
+        Console.Write($"Total won: {moneyWon.AbbreviateIf(moneyWon.GetBitLength() > 512)}🪙");
+        DrawScoreboard(SCOREBOARD_NUM_PLAYERS);
     }
 
     private static bool InteractWithMenu(ref MenuLocation location) {
@@ -143,22 +144,22 @@ internal static class Program {
         if (!File.Exists(FILENAME)) return;
         string[][] scores = File.ReadAllLines(FILENAME)
             .Select(s => s.Split(';'))
-            .OrderBy(s => int.Parse(s[^1]))
+            .OrderBy(s => BigInteger.Parse(s[^1]))
             .Reverse()
             .ToArray();
 
         // Header
-        Console.SetCursorPosition(SCOREBOARD_POSITION_X, SCOREBOARD_POSITION_Y);
+        Console.SetCursorPosition(SCOREBOARD_POSITION_X, ScoreboardPositionY);
         Console.Write("Player");
-        Console.SetCursorPosition(SCORES_POSITION_X, SCOREBOARD_POSITION_Y);
+        Console.SetCursorPosition(SCORES_POSITION_X, ScoreboardPositionY);
         Console.Write("Scores");
 
         // Contents
         for (int i = 0; i < scores.Length && i < maxNumPlayers; i++) {
-            Console.SetCursorPosition(SCOREBOARD_POSITION_X, SCOREBOARD_POSITION_Y + (i + 1) * SCOREBOARD_SPACING);
+            Console.SetCursorPosition(SCOREBOARD_POSITION_X, ScoreboardPositionY + (i + 1) * SCOREBOARD_SPACING);
             Console.Write(scores[i][0]);
-            Console.SetCursorPosition(SCORES_POSITION_X, SCOREBOARD_POSITION_Y + (i + 1) * SCOREBOARD_SPACING);
-            Console.Write(scores[i][1]);
+            Console.SetCursorPosition(SCORES_POSITION_X, ScoreboardPositionY + (i + 1) * SCOREBOARD_SPACING); 
+            Console.Write(BigInteger.Parse(scores[i][1]).AbbreviateIf(scores[i][1].Length >= 15));
         }
     }
 }

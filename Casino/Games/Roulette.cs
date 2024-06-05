@@ -24,16 +24,28 @@ public class Roulette : CasinoGame {
     };
 
     protected override BigInteger PlayRound(BigInteger bet) {
-        int result = Random.Shared.Next(1, 37);
+        int result = 1 + DateTime.Now.Nanosecond % 36;
+
         AudioManager.PlayAudio("Media\\Roulette.mp3");
         for (int i = 0; i < 30; i++) {
             DrawRouletteWheel(CurrentLayout, i);
             Thread.Sleep(100);
         }
-        
-        // TODO: find solution without rotating array (will also fix error with colors)
-        int arrayRotation = CurrentLayout.Length - Array.IndexOf(CurrentLayout, result);
-        DrawRouletteWheel(RotateArray(CurrentLayout, arrayRotation), 0);
+
+        /*
+         * angle:
+         *  0 => 0 on bottom
+         *  Periodic (period: CurrentLayout.Length)
+         *
+         * angleValue: 0 => 0 on bottom
+         * Periodic (period: tau)
+         *
+         * angle * x = angleValue
+         * x = tau/CurrentLayout.Length
+         *
+         */
+        int angle = CurrentLayout.Length - Array.IndexOf(CurrentLayout, result);
+        DrawRouletteWheel(CurrentLayout, angle * Math.Tau / CurrentLayout.Length);
 
         Console.SetCursorPosition(0, Console.WindowHeight - 1); // reset cursor
         return CalculatePayout(IsBetWinning(_betType, result, _betNumber), _betType, bet);
@@ -84,17 +96,17 @@ public class Roulette : CasinoGame {
     private static void DrawRouletteWheel(IReadOnlyList<int> layout, double angleRad) {
         Console.Clear();
 
-        const int RADIUS = 10;
-        const int CENTER_X = 20;
-        const int CENTER_Y = 15;
+        int radius = (Console.WindowHeight - 5) / 2;
+        int centerX = Console.WindowWidth / 2;
+        int centerY = Console.WindowHeight / 2;
         bool red = false;
         int numPoints = layout.Count;
         double angleStep = Math.Tau / numPoints;
 
         for (int i = 0; i < numPoints; i++) {
             double angle = i * angleStep + angleRad;
-            int x = (int)(CENTER_X + RADIUS * Math.Sin(angle) * 2);
-            int y = (int)(CENTER_Y + RADIUS * Math.Cos(angle));
+            int x = (int)(centerX + radius * Math.Sin(angle) * 2);
+            int y = (int)(centerY + radius * Math.Cos(angle));
 
             Console.ForegroundColor = layout[i] == 0
                 ? ConsoleColor.Green
@@ -108,22 +120,8 @@ public class Roulette : CasinoGame {
         }
 
         Console.ForegroundColor = ConsoleColor.White;
-        Console.SetCursorPosition(CENTER_X, CENTER_Y + RADIUS + 2);
+        Console.SetCursorPosition(centerX, centerY + radius + 2);
         Console.Write('\u2191');
-    }
-    
-    // This is my solution to LeetCode problem 189
-    // There is probably a better way for the case it's used for (see usages)
-    // But I'm too tired to think of a good solution
-    private static int[] RotateArray(int[] nums, int k) {
-        int[] result = new int[nums.Length];
-
-        for (int i = 0; i < nums.Length; i++){
-            int newIndex = (i + k) % nums.Length;
-            result[newIndex] = nums[i];
-        }
-
-        return result;
     }
 
     protected override void PrintRules() {
